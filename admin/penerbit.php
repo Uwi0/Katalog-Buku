@@ -1,3 +1,14 @@
+<?php
+include('../koneksi/koneksi.php');
+if((isset($_GET['aksi']))&&(isset($_GET['data']))){
+    if($_GET['aksi']=='hapus'){
+        $id_penerbit = $_GET['data'];
+        //hapus kategori buku
+        $sql_dh = "delete from `penerbit` where `id_penerbit` = '$id_penerbit'";
+        mysqli_query($koneksi,$sql_dh);
+    }
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -52,8 +63,15 @@
                   </form>
                 </div><br>
               <div class="col-sm-12">
-                  <div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>
-                  <div class="alert alert-success" role="alert">Data Berhasil Diubah</div>
+                  <?php if(!empty($_GET['notif'])) {?>
+                      <?php if($_GET['notif']=="tambahberhasil") {?>
+                          <div class="alert alert-success" role="alert">Data Berhasil Ditambahkan</div>
+                      <?php } else if($_GET['notif']=="editberhasil") {?>
+                          <div class="alert alert-success" role="alert">Data Berhasil Diubah</div>
+                      <?php } else if($_GET['notif']=="hapusberhasil"){?>
+                          <div class="alert alert-success" role="alert">Data Berhasil Dihapus</div>
+                      <?php }?>
+                  <?php }?>
               </div>
                 <table class="table table-bordered">
                   <thead>                  
@@ -65,23 +83,25 @@
                     </tr>
                   </thead>
                   <tbody>
+                  <?php
+                  $sql_k = "SELECT `id_penerbit`,`penerbit`, `alamat` FROM `penerbit` ORDER BY `penerbit`";
+                  $query_k = mysqli_query($koneksi, $sql_k);
+                  $no = 1;
+                  while($data_k = mysqli_fetch_row($query_k)) {
+                  $id_penerbit = $data_k[0];
+                  $penerbit = $data_k[1];
+                  $alamat = $data_k[2];
+                  ?>
                     <tr>
-                      <td>1.</td>
-                      <td>Andi</td>
-                      <td>Yogyakarta</td>
-                      <td align="center">
-                        <a href="editpenerbit.php" class="btn btn-xs btn-info"><i class="fas fa-edit"></i> Edit</a>
-                        <a href="#" class="btn btn-xs btn-warning"><i class="fas fa-trash"></i> Hapus</a>
-                      </td>
+                        <td><?php echo $no; ?></td>
+                        <td><?php echo $penerbit; ?></td>
+                        <td><?php echo $alamat; ?></td>
+                        <td align="center">
+                            <a href="editpenerbit.php?data=<?php echo $id_penerbit; ?>" class="btn btn-xs btn-info"><i class="fas fa-edit"></i>Edit</a>
+                            <a href="javascript:if(confirm('Anda yakin ingin menghapus data <?php echo $penerbit; ?>?'))window.location.href = 'penerbit.php?aksi=hapus&data=<?php echo $id_penerbit;?>&notif=hapusberhasil'" class="btn btn-xs btn-warning"><i class="fas fa-trash"></i>Hapus</a>
+                        </td>
                     </tr>
-                    <tr>
-                      <td>2.</td>
-                      <td>Informatika</td>
-                      <td>Bandung</td>
-                      <td align="center">
-                        <a href="editpenerbit.php" class="btn btn-xs btn-info"><i class="fas fa-edit"></i> Edit</a>
-                        <a href="#" class="btn btn-xs btn-warning"><i class="fas fa-trash"></i> Hapus</a>
-                      </td>
+                      <?php $no++; }?>
                     </tr>
                   </tbody>
                 </table>
