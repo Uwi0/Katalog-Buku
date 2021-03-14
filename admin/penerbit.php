@@ -51,7 +51,7 @@ if((isset($_GET['aksi']))&&(isset($_GET['data']))){
               <!-- /.card-header -->
               <div class="card-body">
               <div class="col-md-12">
-                  <form method="" action="">
+                  <form method="get" action="penerbit.php">
                     <div class="row">
                         <div class="col-md-4 bottom-10">
                           <input type="text" class="form-control" id="kata_kunci" name="katakunci">
@@ -84,9 +84,23 @@ if((isset($_GET['aksi']))&&(isset($_GET['data']))){
                   </thead>
                   <tbody>
                   <?php
-                  $sql_k = "SELECT `id_penerbit`,`penerbit`, `alamat` FROM `penerbit` ORDER BY `penerbit`";
+                  $batas = 2;
+                  if(!isset($_GET['halaman'])){
+                      $posisi = 0;
+                      $halaman = 1;
+                  }else{
+                      $halaman = $_GET['halaman'];
+                      $posisi = ($halaman-1) * $batas;
+                  }
+                  $sql_k = "SELECT `id_penerbit`,`penerbit`, `alamat` FROM `penerbit`";
+                  if (isset($_GET["katakunci"])){
+                      $katakunci_penerbit = $_GET["katakunci"];
+                      $sql_k .= " where `penerbit` LIKE '%$katakunci_penerbit'";
+                  }
+                  $sql_k .= " ORDER BY `penerbit`";
                   $query_k = mysqli_query($koneksi, $sql_k);
                   $no = 1;
+//                  echo $sql_k;
                   while($data_k = mysqli_fetch_row($query_k)) {
                   $id_penerbit = $data_k[0];
                   $penerbit = $data_k[1];
